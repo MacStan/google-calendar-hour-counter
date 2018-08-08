@@ -4,7 +4,7 @@ from googleapiclient.discovery import build
 from httplib2 import Http
 from oauth2client import file, client, tools
 from datetime import datetime, timedelta
-
+from dateutil.parser import parse
 # If modifying these scopes, delete the file token.json.
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 
@@ -42,13 +42,23 @@ def main():
                                         orderBy='startTime').execute()
     events = events_result.get('items', [])
 
+    
+    dates = {}
     if not events:
         print('No upcoming events found.')
     for event in events:
         try:
-            print(event['summary'])
+            if( "You" in event['summary']):
+                #print(event['summary'])
+                date = parse(event['start']['dateTime'])
+                print(date.year, date.month, date.day, date.hour, date.minute )
+                dates[ str(date.day) ]  = (date.hour, date.minute )
         except:
             pass
-
+    
+    print(dates)
+    for date, v in dates.items():
+        print( date, v)
+    
 if __name__ == '__main__':
     main()
